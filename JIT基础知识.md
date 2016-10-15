@@ -87,6 +87,8 @@ public class ObjectSize {
         System.out.println(SizeOfTool.getObjectSize(new HashMap(),SizeEnum.B));
     }
 }
+```
+```
 //32位下对象头8字节，byte占1字节，对其填充后，总占16字节
 //64位开启指针压缩下对象头12字节，byte1字节，对齐后占16字节
 class A{
