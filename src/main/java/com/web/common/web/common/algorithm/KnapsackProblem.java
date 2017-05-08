@@ -41,6 +41,7 @@ class Fruit {
  * @date: 2016年5月21日 上午12:21:41
  */
 public class KnapsackProblem {
+
   public static void main(String[] args) {
     final int MAX = 8;
     final int MIN = 1;

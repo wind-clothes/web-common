@@ -17,7 +17,7 @@ public class Sort {
   private static int[] a = {10, 8, 29, 45, 18, 5, 3, 7, 2};
 
   public static void main(String[] args) {
-    radix_sort(a);
+    quick_sort(a);
     for (int a : a) {
       System.out.print(a + " ");
     }
@@ -49,7 +49,7 @@ public class Sort {
       return;
 
     if (low < high) { // 如果不加这个判断递归会无法退出导致堆栈溢出异常
-      int middle = partition1(a, low, high);
+      int middle = partition(a, low, high);
       if (middle > low)
         quickSort(a, low, middle - 1);
       if (middle < high)
@@ -65,7 +65,7 @@ public class Sort {
   public static int partition(int[] a, int low, int high) {
     // 每次选取第一个元素为比较值，后期需要增加随机性
     // 比如采取抽样算法，来增加该值的随机性
-    int index = high;
+    int index = low;
 
     int privot = a[index];
 
@@ -227,8 +227,9 @@ public class Sort {
       int m = (low + high) / 2;
       // 左边合并排序
       merge_sort(a, low, m);
+      // 右边合并排序
       merge_sort(a, m + 1, high);
-      //合并
+      // 左右合并
       merge_sort(a, low, m, high);
     }
   }
@@ -276,7 +277,7 @@ public class Sort {
     while (true) {
       d = d/2;
       for (int x = 0; x < d; x++) {//d组
-        //每一组内进行直接插入排序
+        //每一组内进行直接插入排序10, 8, 29, 45, 18, 5, 3, 7, 2
         for (int i = x; i < a.length; i = i + d) {
           for (int j = i-d; j >= 0 && a[j] > a[j+d]; j = j-d) {
             swap(a, j+d, j);
@@ -302,9 +303,9 @@ public class Sort {
    * @return void
    */
   public static void heap_sort(int[] a) {
-    for (int i = 0; i < a.length-1; i++) {
-      build_max_heap(a,a.length-i-1);
-      swap(a, 0, a.length-i-1);
+    for (int i = 0; i < a.length - 1; i++) {
+      build_max_heap(a, a.length - i - 1);
+      swap(a, 0, a.length - i - 1);
     }
   }
 

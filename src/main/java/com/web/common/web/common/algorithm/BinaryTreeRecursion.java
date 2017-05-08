@@ -5,7 +5,7 @@ import java.util.Stack;
 
 /**
  * <pre>
- * 递归
+ * 遍历二叉树
  * </pre>
  *
  * @author: chengweixiong@uworks.cc
@@ -98,17 +98,17 @@ public class BinaryTreeRecursion {
       return;
     }
     // 根节点入栈
-    stack.push(node);
-    while (!stack.isEmpty()) {
-      node = stack.pop();
-      System.out.println("node vale :" + node.getValue());
-      if (node.getRightChild() != null) {
-        stack.push(node.getRightChild());
-      }
-      if (node.getLeftChild() != null) {
+   stack.push(node);
+   while(!stack.isEmpty()){
+     node = stack.pop();
+     System.out.println("node value :" +node.getValue());
+     if (node.getRightChild() != null) {
+       stack.push(node.getRightChild());
+     }
+     if (node.getLeftChild() != null) {
         stack.push(node.getLeftChild());
-      }
-    }
+     }
+   }
   }
 
   /**
@@ -141,18 +141,17 @@ public class BinaryTreeRecursion {
     if (node == null) {
       return;
     }
-    BinaryTreeNode tmpNode = node;
-    while (tmpNode != null || !stack.isEmpty()) {
-      // 先将根节点和左节点循环入栈
-      while (tmpNode != null) {
-        stack.push(tmpNode);
-        tmpNode = tmpNode.getLeftChild();
+    BinaryTreeNode tempNode = node;
+    while(tempNode != null || !stack.isEmpty()){
+      // 先把左子节点入栈
+      while(tempNode != null){
+        stack.push(tempNode);
+        tempNode = tempNode.getLeftChild();
       }
-      // 循环左节点和根节点出栈，然后将临时节点指向右节点
       if (!stack.isEmpty()) {
-        tmpNode = stack.pop();
-        System.out.println("node vale :" + tmpNode.getValue());
-        tmpNode = tmpNode.getRightChild();
+        tempNode = stack.pop();
+        System.out.println("Node value:"+tempNode.getValue());
+        tempNode = tempNode.getRightChild();
       }
     }
   }
@@ -193,7 +192,7 @@ public class BinaryTreeRecursion {
       // 当前节点无右子或右子已经输出
       while (node != null
           && (node.getRightChild() == null || node.getRightChild().equals(tmpNode))) {
-        System.out.println("node vale :" + node.getValue());
+        System.out.println("node value :" + node.getValue());
         tmpNode = node;// 记录上一个已输出节点
         if (stack.empty())
           return;
