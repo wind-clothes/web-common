@@ -29,19 +29,30 @@ _____
 
 * 消息的传送保证
 
-```
-At most once 消息可能会丢，但绝不会重复传输
-At least one 消息绝不会丢，但可能会重复传输
-Exactly once 每条消息肯定会被传输一次且仅传输一次，很多时候这是用户所想要的。
-```
+  ```
+    At most once 消息可能会丢，但绝不会重复传输
+    At least one 消息绝不会丢，但可能会重复传输
+    Exactly once 每条消息肯定会被传输一次且仅传输一次，很多时候这是用户所想要的。
+  ```
   针对producer端，默认是支持**At least one**的，因为当Producer向broker发送消息时，一旦这条消息被commit，因数replication的存在，它就不会丢可以通过但是Producer可以生成一种类似于主键的东西，发生故障时幂等性的重试多次
 
-  针对consumer端，默认支持**At least one**Consumer从broker中pull消息的时候，一旦其消费完成，其将像zookeeper进行commit操作，修改offset，等下次pull消息的时候，根据offset自动消费下一条消息，如果想保证**Exactly once**可以通过业务的幂等性来处理或者需要协调offset和实际操作的输出
-1.经典的做法是引入两阶段提交，2如果能让offset和操作输入存在同一个地方，比如存在同一机器的HDFS中。
+  针对consumer端，默认支持**At least one**Consumer从broker中pull消息的时候，一旦其消费完成，其将像zookeeper进行commit操作，修改offset，等下次pull消息的时候，根据offset自动消费下一条消息，如果想保证**Exactly once**可以通过业务的幂等性来处理或者需要协调offset和实际操作的输出-1.经典的做法是引入两阶段提交，2如果能让offset和操作输入存在同一个地方，比如存在同一机器的HDFS中。
 
 ###实现原理
 
 * 高可用
+  Kafka分配Replica的算法如下：
+
+将所有Broker（假设共n个Broker）和待分配的Partition排序
+将第i个Partition分配到第（i mod n）个Broker上
+将第i个Partition的第j个Replica分配到第（(i + j) mod n）个Broker上
+
+Kafka的Data Replication需要解决如下问题：
+
+怎样Propagate(传播)消息
+在向Producer发送ACK前需要保证有多少个Replica已经收到该消息
+怎样处理某个Replica不工作的情况
+怎样处理Failed Replica恢复回来的情况
 
 * 高性能
 
@@ -63,7 +74,3 @@ Exactly once 每条消息肯定会被传输一次且仅传输一次，很多时�
   采用zookeeper来协调数据的生产和消费,Producer使用push模式将消息发布到broker,Consumer使用pull模式从broker订阅并消费消息。
 
 * 数据的持久化
-
-
-
-
