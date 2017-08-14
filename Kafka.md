@@ -21,6 +21,8 @@ _____
 
 * 基本数据结构和存储机制
 
+<img src="./ds/kafka_data.png" height="200px" width="300px"></img>
+
 * 消息的路由
   在Producer进行消息传送的时候，可以根据自定义的策略来处理消息的负载均衡，是通过partition参数进行的处理的
 
@@ -51,6 +53,10 @@ _____
     在向Producer发送ACK前需要保证有多少个Replica已经收到该消息
     怎样处理某个Replica不工作的情况
     怎样处理Failed Replica恢复回来的情况
+
+  * Broker宕机
+  * Partition的leader挂了，follwer挂了，全挂了。
+  * Controller挂了
 
 * 高性能
 
@@ -139,20 +145,14 @@ _____
 注意：最后一步才将Zookeeper中的AR更新，因为这是唯一一个持久存储AR的地方，如果Controller在这一步之前crash，新的Controller仍然能够继续完成该过程。
 　　以下是Partition重新分配的案例，OAR = ｛1，2，3｝，RAR = ｛4，5，6｝，Partition重新分配过程中Zookeeper中的AR和Leader/ISR路径如下
 
-<table>
-<thead>
-<tr>
+<table><thead><tr>
 <th>AR</th>
 <th>leader/isr</th>
-<th>Step</th>
-</tr>
-</thead>
-<tbody>
-<tr>
+<th>Step</th></tr></thead>
+<tbody><tr>
 <td>{1,2,3}</td>
 <td>1/{1,2,3}</td>
-<td>(initial state)</td>
-</tr>
+<td>(initial state)</td></tr>
 <tr>
 <td>{1,2,3,4,5,6}</td>
 <td>1/{1,2,3}</td>
@@ -177,12 +177,10 @@ _____
 <td>{4,5,6}</td>
 <td>4/{4,5,6}</td>
 <td>(step 10)</td>
-</tr>
-</tbody>
-</table>
+</tr></tbody></table>
 
 
 待解决的问题：
 
-cap问题的原因,log文件存储的数据是什么，持久化机制。p的消息确认和fllower的ack是不是异步的。
+cap问题的原因,log文件存储的数据是什么，持久化机制。
 
