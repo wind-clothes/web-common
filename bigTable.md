@@ -1,4 +1,4 @@
-##BigTable
+## BigTable
 Bigtable 是一个分布式的结构化数据存储系统,它被设计用来处理海量数据:通常是分布在数千台普通服 务器上的 PB 级的数据。
 满足：适用性广泛、可扩展、高性能和高可用性。
 
@@ -6,7 +6,7 @@ Bigtable 是一个分布式的结构化数据存储系统,它被设计用来处�
 Bigtable 是一个稀疏的、分布式的、持久化存储的多维度排序 Map5。Map 的索引是行关键字、列关键字 以及时间戳;Map 中的每个 value 都是一个未经解析的 byte 数组。
 * 行
 * 列族
-* 时间戳
+* 时间戳： 每一个数据项都存在一个时间戳，用来维护一个多版本的极致
 * LSM TREE
 
 ### 系统的基础架构
@@ -21,11 +21,9 @@ stream->SetReturnAllVersions(); scanner.Lookup(“com.cnn.www”);
 for (; !stream->Done(); stream->Next()) {
 printf(“%s %s %lld %s\n”, scanner.RowName(),
 stream->ColumnName(), stream->MicroTimestamp(), stream->Value());
-
 }
 ```
-￼￼￼
-各样的分布式应用程序,BigTable 的进程经常要和其它应用的进程共享机器。BigTable 依赖集群管理系统来调度任务、管理共享的机器上的资源、处理机器的故障、以及监视机器的状态。
+￼各样的分布式应用程序,BigTable 的进程经常要和其它应用的进程共享机器。BigTable 依赖集群管理系统来调度任务、管理共享的机器上的资源、处理机器的故障、以及监视机器的状态。
 
 BigTable 内部存储数据的文件是 Google SSTable 格式的。SSTable 是一个持久化的、排序的、不可更改的Map 结构,而 Map 是一个 key-value 映射的数据结构,key 和 value 的值都是任意的 Byte 串。可以对 SSTable 进行如下的操作:查询与一个 key 值相关的 value,或者遍历某个 key 值范围内的所有的 key-value 对。从内 部看,SSTable 是一系列的数据块(通常每个块的大小是 64KB,这个大小是可以配置的)。SSTable 使用块索 引(通常存储在 SSTable 的最后)来定位数据块;在打开 SSTable 的时候,索引被加载到内存。每次查找都可 以通过一次磁盘搜索完成:首先使用二分查找法在内存中的索引里找到数据块的位置,然后再从硬盘读取相 应的数据块。也可以选择把整个 SSTable 都放在内存中,这样就不必访问硬盘了。
 
@@ -40,6 +38,29 @@ Bigtable 使用 Chubby 完成以下的几个任务:
 5. 以及存储访问控制列表。
 
 如果 Chubby 长时间无法访问,BigTable 就会失效。最近我们在使用 11 个 Chubby 服务实例的 14 个 BigTable集群上测量了这个影响。由于 Chubby 不可用而导致 BigTable 中的部分数据不能访问的平均比率是 0.0047% (Chubby 不能访问的原因可能是 Chubby 本身失效或者网络问题)。单个集群里,受 Chubby 失效影响最大的 百分比是 0.0326%10。
+
+### 系统组件
+
+Bigtable包括了三个主要的组件：链接到客户程序中的库、一个Master服务器和多个Tablet服务器。针对系统工作负载的变化情况，BigTable 可以动态的向集群中添加（或者删除）Tablet 服务器。 
+
+Master 服务器主要负责以下工作：为 Tablet 服务器分配 Tablets、检测新加入的或者过期失效的 Table 服务器、对 Tablet 服务器进行负载均衡、以及对保存在 GFS 上的文件进行垃圾收集。除此之外，它还处理对模式的相关修改操作，例如建立表和列族。
+
+每个 Tablet服务器都管理一个Tablet的集合（通常每个服务器有大约数十个至上千个Tablet）。每个Tablet服务器负责处理它所加载的 Tablet 的读写操作，以及在 Tablets 过大时，对其进行分割。
+
+一个 BigTable 集群存储了很多表，每个表包含了一个Tablet的集合，而每个Tablet包含了某个范围内的行的所有相关数据。初始状态下，一个表只有一个 Tablet。随着表中数据的增长，它被自动分割成多个 Tablet，缺省情况下，每个 Tablet 的尺寸大约是 100MB 到 200MB.
+
+* Tablet的位置
+	在Chubby存储着Tablets的元数据（METADATA）,整个tablets的数据存储模型结构是一个三层的结构，如图：
+
+	客户端程序会将该Tablet信息缓存在本地中，采用的类似于CPU体系中的多级缓存策略，会存在缓存不命中和缓存失效的情况，在这两种情况下，客户端程序会和Chubby进行通信回去信息，来回需要3次和6次的网络通信
+
+* Tablet分配
+	在任何一个时刻，一个Tablet只能分配给一个Tablet服务器。Master服务器记录了当前有哪些活跃的Tablet 服务器、哪些 Tablet 分配给了哪些Tablet服务器、哪些Tablet还没有被分配。当一个Tablet还没有被分配、并且刚好有一个Tablet服务器有足够的空闲空间装载该 Tablet 时，Master 服务器会给这个 Tablet 服务器发送一个装载请求，把 Tablet 分配给这个服务器。
+
+* Tablet服务
+
+* 空间伸缩
+	
 
 ### 优化方案
 
