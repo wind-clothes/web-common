@@ -11,7 +11,7 @@ Gossip协议
 
 DYNAMO
 #### 分布式一致性协议的演进
-
+[选择](https://yqfile.alicdn.com/f4ca6bc0d5bd9c769bee5046e3f8f1072b0ea1f9.jpeg)
 * 2PC
 
 * 3PC
@@ -20,6 +20,10 @@ DYNAMO
 
 * Raft
 
+* Sagas长事务
+* 补偿模式
+* 可靠事件模式（非事务消息、事务消息）
+* TCC
 * 最终一致性协议
   + Quorum W+R>N：抽屉原理，数据一致性的另一种解决方案
     最后我还想提一下Amazon Dynamo的NWR模型。这个NWR模型把CAP的选择权交给了用户，让用户自己的选择你的CAP中的哪两个。
@@ -60,6 +64,7 @@ DYNAMO
 
 
 #### CAP
+
 #### BASE
 BASE理论
 BASE是Basically Available（基本可用）、Soft state（软状态）和Eventually consistent（最终一致性）三个短语的简写，是由来自eBay的架构师Dan Pritchett在其文章BASE: An Acid Alternative注 中第一次明确提出的。BASE是对CAP中一致性和可用性权衡的结果，其来源于对大规模互联网系统分布式实践的总结，是基于CAP定理逐步演化而来的，其核心思想是即使无法做到强一致性(Strong consistency)，但每个应用都可以根据自身的业务特点，采用适当的方式来使系统达到最终一致性(Eventual consistency)。接下来我们着重对BASE中的三要素进行详细讲解。
