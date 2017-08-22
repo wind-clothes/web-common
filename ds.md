@@ -10,6 +10,7 @@ Gossip协议
 DYNAMO
 #### 分布式一致性协议的演进
 ![cap](http://coolshell.cn//wp-content/uploads/2014/01/Transaction-Across-DataCenter.jpg)
+![cap](./images/ds/f4ca6bc0d5bd9c769bee5046e3f8f1072b0ea1f9 (1).jpeg)
 
 
 * 2PC
