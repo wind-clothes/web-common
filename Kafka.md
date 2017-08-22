@@ -21,7 +21,7 @@ _____
 
 * 基本数据结构和存储机制
 
-<img src="./ds/kafka_data.png" height="200px" width="300px"></img>
+<img src="./images/ds/kafka_data.png" height="200px" width="300px"></img>
 
 * 消息的路由
   在Producer进行消息传送的时候，可以根据自定义的策略来处理消息的负载均衡，是通过partition参数进行的处理的
