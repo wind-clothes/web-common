@@ -114,7 +114,7 @@ _____
   * 若partitionsToBeFollower不为空，则对其执行makeFollowers方法。
   * 若highwatermak线程还未启动，则将其启动，并将hwThreadInitialized设为true。
   * 关闭所有Idle状态的Fetcher。
-<img src="./ds/LeaderAndIsrRequest_Flow_Chart.png" height="200px" width="200px"></img>
+<img src="./images/ds/LeaderAndIsrRequest_Flow_Chart.png" height="200px" width="200px"></img>
 
 * 创建/删除Topic
 
@@ -125,7 +125,7 @@ _____
 　　3.2 将新的Leader和ISR写入/brokers/topics/[topic]/partitions/[partition]
   * 直接通过RPC向相关的Broker发送LeaderAndISRRequest。
 
-<img src="./ds/kafka_create_topic.png" height="200px" width="200px"></img>
+<img src="./images/ds/kafka_create_topic.png" height="200px" width="200px"></img>
 
 * Partition重新分配
 　　管理工具发出重新分配Partition请求后，会将相应信息写到/admin/reassign_partitions上，而该操作会触发ReassignedPartitionsIsrChangeListener，从而通过执行回调函数KafkaController.onPartitionReassignment来完成以下操作：
