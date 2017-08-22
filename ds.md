@@ -1,8 +1,6 @@
 lease机制
 
 
-
-
 vector clock：时钟向量，多版本数据修改
 
 [分布式事务](http://coolshell.cn/articles/10910.html)
@@ -11,7 +9,9 @@ Gossip协议
 
 DYNAMO
 #### 分布式一致性协议的演进
- ![ Cap ](https://yqfile.alicdn.com/f4ca6bc0d5bd9c769bee5046e3f8f1072b0ea1f9.jpeg)
+![cap](http://coolshell.cn//wp-content/uploads/2014/01/Transaction-Across-DataCenter.jpg)
+
+
 * 2PC
 两阶段提交，组成有事务协调者和事务发起方，业务参与者，步骤是分为事务准备阶段和事务提交阶段。
   准备阶段：由事务发起方访问事务协调者，然后事务协调者发起一个分布式事务，然后向每一个事务参与者发起（prepare commit）操作，参与者可以失败，可以成功的（在本地执行事务，写本地的redo和undo日志，但不提交）响应给协调者，协调者收到所有参与者返回的信息，决定是执行全局回滚操作，还是提交（正式的commit）.
@@ -74,7 +74,7 @@ DYNAMO
   在doCommit阶段，如果参与者无法及时接收到来自协调者的doCommit或者rebort请求时，会在等待超时之后，会继续进行事务的提交。（其实这个应该是基于概率来决定的，当进入第三阶段时，说明参与者在第二阶段已经收到了PreCommit请求，那么协调者产生PreCommit请求的前提条件是他在第二阶段开始之前，收到所有参与者的CanCommit响应都是Yes。（一旦参与者收到了PreCommit，意味他知道大家其实都同意修改了）所以，一句话概括就是，当进入第三阶段时，由于网络超时等原因，虽然参与者没有收到commit或者abort响应，但是他有理由相信：成功提交的几率很大。 ）
 
 其实3PC还是无法解决参与者数据不一致的问题，只是将不一致的问题发生的概率降低了
-[3PC的不确定因素](http://coolshell.cn//wp-content/uploads/2014/01/Three-phase_commit_status.png)
+![3PC的不确定因素](http://coolshell.cn//wp-content/uploads/2014/01/Three-phase_commit_status.png)
 
 * PAXOS
 
@@ -128,7 +128,7 @@ DYNAMO
 
 #### CAP
 一致性（数据的一致性，ACID），高可用(快速的响应，即使是失败也能快速的响应)，分区容错，
-[Cap](http://cdn4.infoqstatic.com/statics_s1_20160712-0252u2/resource/articles/solution-of-distributed-system-transaction-consistency/zh/resources/000.png?_=5679542)
+![CAP](http://cdn4.infoqstatic.com/statics_s1_20160712-0252u2/resource/articles/solution-of-distributed-system-transaction-consistency/zh/resources/000.png?_=5679542)
 
 #### BASE
 BASE理论
