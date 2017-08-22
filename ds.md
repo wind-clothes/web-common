@@ -11,7 +11,7 @@ Gossip协议
 
 DYNAMO
 #### 分布式一致性协议的演进
-[https://yqfile.alicdn.com/f4ca6bc0d5bd9c769bee5046e3f8f1072b0ea1f9.jpeg]
+! [Cap] (https://yqfile.alicdn.com/f4ca6bc0d5bd9c769bee5046e3f8f1072b0ea1f9.jpeg)
 * 2PC
 两阶段提交，组成有事务协调者和事务发起方，业务参与者，步骤是分为事务准备阶段和事务提交阶段。
   准备阶段：由事务发起方访问事务协调者，然后事务协调者发起一个分布式事务，然后向每一个事务参与者发起（prepare commit）操作，参与者可以失败，可以成功的（在本地执行事务，写本地的redo和undo日志，但不提交）响应给协调者，协调者收到所有参与者返回的信息，决定是执行全局回滚操作，还是提交（正式的commit）.
