@@ -128,6 +128,15 @@ DYNAMO
 
 
 #### CAP
+1，P是分布式系统的起点，全称：network partition，常指拔网线和宕机，因为这两种现象，同伴是无法区分的，所以归为一类。分布式系统下，P是大概率事件，假设服务器开一年必宕机一次，则365台的集群必然天天宕机。数据分存这365台之上，则数据必然天天不完整。
+你设计的分布式系统能容忍吗？绝大多数是不能，不能则
+
+2，复制，是解决这一问题的标准做法
+
+3，复制，引发了C
+
+4，C引发了A
+
 一致性（数据的一致性，ACID），高可用(快速的响应，即使是失败也能快速的响应)，分区容错，
 ![CAP](http://cdn4.infoqstatic.com/statics_s1_20160712-0252u2/resource/articles/solution-of-distributed-system-transaction-consistency/zh/resources/000.png?_=5679542)
 
