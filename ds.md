@@ -81,6 +81,85 @@ DYNAMO
 
 * Raft
 
+Raft是工程化中非常有名且有效的分布式一致性算法，本次关注：Leader选举和日志的部分（对应Lab 2A与2B），下节关注：持久化、客户端行为和快照（Lab 2C和Lab 3）
+
+Raft是Paxos算法的简化版本，基于自动机复制(state machine replcation)，即所有备份节点都执行相同的命令序列，以求得到相同的结果。核心问题就是要处理脑裂的问题，实现的基础在于保证“大多数”节点还是存活的，这里的“大多数”（quorm）指总数中超过半数。
+
+Raft使用日志作为复制的单位载体（仅利用KV DB来维护状态并不够），思路是编号定序与方便存储，编号定序保证复制命令执行顺序性，存储保证消息可靠性。
+
+Raft设计的两个难点：
+
+选择新leader
+保证日志执行顺序，即使出现各种失效
+Lab2A就是要实现一个选主算法。
+
+首先考虑为何要选出leader？可以简化设计，保证其他节点执行按相同顺序执行相同命令。Raft使用term概念标记leader顺序，一个term中最多一个leader（可能没有leader），帮助其他节点找到最新的leader。
+
+何时开始选主？节点发现收到主节点通信时，增加自己的term值，发起选举。注意这样可能导致不必要的选举过程，但是安全；也可能出现原leader还存活并且自认还是leader的情况。旧leader仅会影响“小部分”节点，大多数不会执行它的指令。
+
+如何保证只有最多一个leader获胜？所有节点每轮只需投票一次，回应第一个询问的节点。获得“大多数“”节点投票信息的leader获胜。其他节点通过接收主节点的AppendEntries和心跳信息得知leader的获胜与存活。可能出现没有leader胜出的情况【活锁问题】，此时会超时并重新发起选举（term值递增）。
+
+如何选择超时时间？至少几个心跳时间，节点随机选择长度，但要足够完成一轮选举。
+
+选主算法的工程实现要点
+
+节点需要维护的字段：
+
+参数	解释
+currentTerm	服务器最后一次知道的任期号（初始化为 0，持续递增），需要持久化
+votedFor	在当前term获得选票的候选人 Id，需要持久化
+log[]	日志条目集；每一个条目包含一个用户状态机执行的指令，和收到时的任期号，需要持久化
+--	--
+state	节点状态（Leader，Candidate，Follower）三种之一
+commitIndex	已知的最大的已经被提交的日志条目的索引值
+lastApplied	最后被应用到状态机的日志条目索引值（初始化为 0，持续递增）
+--	--
+nextIndex[]	对于每一个服务器，需要发送给他的下一个日志条目的索引值（初始化为领导人最后索引值加一），leader有用
+matchIndex[]	对于每一个服务器，已经复制给他的日志的最高索引值，leader有用
+节点可以发出两个RPC：
+
+AppendLogEntries
+平时的日志同步RPC，同时有心跳功能。
+
+如果接收到的 RPC 请求中，term > currentTerm ，那么就令 currentTerm 等于 term，并切换状态为跟随者
+Args参数	解释
+term	领导人的任期号
+leaderId	领导人的 Id，以便于跟随者重定向请求
+prevLogIndex	新的日志条目紧随之前的索引值
+prevLogTerm	prevLogIndex条目的任期值
+entries[]	需要存储当然日志条目（表示心跳时为空；一次性发送多个是为了提高效率）
+leaderCommit	领导人已经提交的日志的索引值
+--	--
+Reply返回值	解释
+term	当前的任期号，用于领导人去更新自己
+success	跟随者包含了匹配上 prevLogIndex 和 prevLogTerm 的日志时为真
+RequestVoteFor
+由候选人负责调用用来征集选票。
+
+如果 term < 接收节点的currentTerm，则设置term并返回 voteGranted = false表示忽略这个选票
+如果接收节点的 votedFor 为空或者等于 candidateId，并且lastLogXXX信息与自己的一样新，则继续返回投票
+如果接收到的 RPC 请求中，term > currentTerm ，那么就令 currentTerm 等于 term，并切换状态为跟随者
+Args参数	解释
+term	候选人的任期号
+candidateId	请求选票的候选人的 Id
+lastLogIndex	候选人的最后日志条目的索引值
+lastLogTerm	候选人最后日志条目的任期号
+--	--
+Reply返回值	解释
+term	当前任期号，以便于候选人去更新自己的任期号
+voteGranted	候选人赢得了此张选票时为真
+节点线程模型
+
+所有节点Follower启动一个检测线程，如果在超过选举超时时间的情况之前都没有收到Leader的心跳，或者是候选人请求投票的，就自己变成Candidate
+变为Candidate启动一个选举线程，
+自增当前的任期号（currentTerm）
+给自己投票
+重置选举超时计时器，选举超时时间是从一个固定的区间（例如 150-300毫秒）随机选择
+发送请求投票的 RPC 给其他所有服务器
+如果接收到大多数服务器的选票，那么就变成领导人
+如果接收到的 RPC 请求中，term > currentTerm ，那么就令 currentTerm 等于 term，并切换状态为跟随者。注意在等待投票的时候，candidate可能会从其他节点接收到声明它是leader的AppendLogEntries RPC
+成为Leader后启动一个心跳线程，定期发送心跳信息（100毫秒）
+
 * 最终一致性协议
 
 	* 补偿模式：将消息的不可靠和处理失败的问题由单独的补偿方式来解决，需要提供补偿的接口来做，事务数据的补偿操作。
