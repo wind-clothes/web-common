@@ -11,13 +11,95 @@ Lock机制实现的关键技术为以下几点：
 
 #### AQS
 ----
+AQS的CLH队列中节点的状态
 
+```
+
+---------------------------------------------
+
+CANCELLED =  1//表明当前节点是被取消
+  This node is cancelled due to timeout or interrupt.
+  当前节点由于超时或者被中断而被取消。一旦节点被取消后，那么它的状态值不在会被改变，且当前节点的线程不会再次被阻塞
+  
+---------------------------------------------
+ 
+SIGNAL    = -1//表明当前节点的后续节点是park住的，需要unparking唤醒
+  Nodes never leave this state. In particular,
+  a thread with cancelled node never again blocks
+  The successor of this node is (or will soon be)
+  blocked (via park), so the current node must
+  unpark its successor when it releases or
+  cancels. To avoid races, acquire methods must
+  first indicate they need a signal,
+  then retry the atomic acquire, and then,
+  on failure, block.
+ 当前节点的后继节点已经 (或即将)被阻塞（通过park） , 所以当 当前节点释放或则被取消时候，一定要unpark它的后继节点。为了避免竞争，获取方法一定要首先设置node为signal，然后再次重新调用获取方法，如果失败，则阻塞
+
+
+PROPAGATE = -3// 表明当前节点的下一个acquireShared是无条件传播到后续节点，猜测是适用于读写锁模式下。
+  A releaseShared should be propagated to other
+  nodes. This is set (for head node only) in
+  doReleaseShared to ensure propagation
+  continues, even if other operations have
+  since intervened.
+  共享模式下的释放操作应该被传播到其他节点。该状态值在doReleaseShared方法中被设置的，
+  读写锁中，当读锁最开始没有获取到操作权限，得到后会发起一个doReleaseShared()动作，内部也是一个循环，当判定后续的节点状态为0时，尝试通过CAS自旋方式将状态修改为这个状态，表示节点可以运行。
+
+DEFAULT = 0:          None of the above 以上都不是
+         
+---------------------------------------------
+
+CONDITION = -2//表明当前节点是在等待一个满足的条件（signal），然后唤醒，适用于Condition
+  This node is currently on a condition queue.
+  It will not be used as a sync queue node until transferred, at which time the status
+  will be set to 0. (Use of this value here has
+  nothing to do with the other uses of the
+  field, but simplifies mechanics.)
+表示当前节点正在条件队列（AQS下的ConditionObject里也维护了个队列）中，在从conditionObject队列转移到同步队列前，它不会在同步队列（AQS下的队列）中被使用,当成功转移后，该节点的状态值将由CONDION设置为0.
+
+void await() throws InterruptedException;
+void awaitUninterruptibly();
+long awaitNanos(long nanosTimeout) throws InterruptedException;
+boolean await(long time, TimeUnit unit) throws InterruptedException;
+boolean awaitUntil(Date deadline) throws InterruptedException;
+void signal();
+void signalAll();
+
+1. 线程1调用reentrantLock.lock时，占用锁。
+
+2. 线程1调用await方法被调用时，对应操作是锁的释放。
+
+3. 接着马上被加入到Condition的等待队列中，以为着该线程需要signal信号。
+
+4. 线程2，因为线程1释放锁的关系，被唤醒，并判断可以获取锁，于是线程2获取锁。
+
+5. 线程2调用signal方法，这个时候Condition的等待队列中只有线程1一个节点，于是它被取出来，并被加入到AQS的等待队列中。注意，这个时候，线程1并没有被唤醒。
+
+6. signal方法执行完毕，线程2调用reentrantLock.unLock()方法，释放锁。这个时候因为AQS中只有线程1，于是，AQS释放锁后按从头到尾的顺序唤醒线程时，线程1被唤醒，于是线程1回复执行。
+
+7. 直到释放所整个过程执行完毕。
+
+可以看到，整个协作过程是靠结点在AQS的等待队列和Condition的等待队列中来回移动实现的，Condition作为一个条件类，很好的自己维护了一个等待信号的队列，并在适时的时候将结点加入到AQS的等待队列中来实现的唤醒操作。
+
+---------------------------------------------
+
+The values are arranged numerically to simplify use. Non-negative values mean that a node doesn't need to signal. So, most code doesn't need to check for particular values, just for sign.The field is initialized to 0 for normal sync nodes, and CONDITION for condition nodes.  It is modified using CAS (or when possible, unconditional volatile writes).
+该状态值为了简便使用，所以使用了数值类型。非负数值意味着该节点不需要被唤醒。所以，大多数代码中不需要检查该状态值的确定值,只需要根据正负值来判断即可对于一个正常的Node，他的waitStatus初始化值时0.对于一个condition队列中的Node，他的初始化值时CONDITION如果想要修改这个值，可以使用AQS提供CAS进行修改
+
+Link to next node waiting on condition, or the special value SHARED.  Because condition queues are accessed only when holding in exclusive mode, we just need a simple linked queue to hold nodes while they are waiting on conditions. They are then transferred to the queue to re-acquire. And because conditions can only be exclusive,we save a field by using special value to indicate shared mode.
+ConditionObject链表的后继节点或者代表共享模式的节点SHARED。Condition条件队列：因为Condition队列只能在独占模式下被能被访问,我们只需要简单的使用链表队列来链接正在等待条件的节点。再然后它们会被转移到同步队列（AQS队列）再次重新获取。由于条件队列只能在独占模式下使用，所以我们要表示共享模式的节点的话只要使用特殊值SHARED来标明即可。
+
+Node nextWaiter //在共享模式下使用的等待节点和Condition的时候使用
+
+waitStatus must be 0 or PROPAGATE.  Indicate that we need a signal, but don't park yet.  Caller will need to retry to make sure it cannot acquire before parking.
+执行到这里代表节点是0或者PROPAGATE，然后标记他们为SIGNAL，但是还不能park挂起线程。需要重试是否能获取，如果不能则挂起
+```
 
 ```
 public void acquire(int arg){
    while(tryAcquire(arg)方法进行当前状态是否可以进行获取锁的操作){
         if(是否阻塞当前线程等待可进行操作){
-           park住当前线程，并将其加入等待线程队列
+           并将其加入等待线程队列并park住当前线程，
         }else{
            返回失败
         }
