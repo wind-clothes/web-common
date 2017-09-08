@@ -8,9 +8,68 @@ vector clock：时钟向量，多版本数据修改
 Gossip协议
 
 DYNAMO
+
 #### 分布式一致性协议的演进
 ![cap](./images/ds/Transaction-Across-DataCenter.jpg)
 ![cap](./images/ds/dt_data.jpeg)
+
+##web设计
+
+TOKEN-生成策略：
+加上设备号相关的信息，用户ID，可以参考JWT。
+
+
+那么序列值为 id << 2 | table_index; 即id向左移位2位（移位几位取决于表的个数）， 然后和表序号求或
+
+###
+分布式系统分为分布式存储系统，分布式计算系统，分布式的管理系统
+
+分布式存储系统:
+
+* 数据的分割
+* 数据的多副本
+* 数据的读写分离
+* IPC通信
+* 可用性保证
+* 网络，硬件的异常处理
+
+分布式计算系统:
+
+* 分工方式
+* 数据交换方式
+* 支持的运算种类
+* 通信处理
+* 运算的状态管理
+* 可用性保障
+
+### ES
+缺省情况，查询发出的请求数量为shard 的数量，可扩展
+读，可以通过增加副本
+复杂统计查询，瓶颈在mem/cpu/io
+如果qps 要求高，主要需要靠缓存
+写，通过增加机器
+相对宽裕的shard数量
+增加机器的时候，shard 可以自动调整到新加的机器，扩容方便
+
+C，A
+写 
+by default, index operations only succeed if a quorum (>replicas/2+1) of active shards are available.
+譬如3 个replica, ¾  个就可以
+1个replication 的情况下，退化为one,只要有一个写成功就可以
+不可用，有可能是由于master 不可用导致
+读
+只要一个就可以
+public enum WriteConsistencyLevel {DEFAULT((byte) 0),  ONE((byte) 1),QUORUM((byte) 2),ALL((byte) 3);}
+集群下有可能丢失数据
+即使有primary + 2个replica, 这个是由于网络partition 导致Primary+1个replica, 更有可能导致，脑裂和数据的丢失
+为了一致性，可以选write consistency level 为ALL setConsistencyLevel(WriteConsistencyLevel.ALL)
+
+MASTER
+选举master
+从几个可以备选master 中选举
+Master 负责shard 分配，判断shard 可用性，mapping 维护等
+超过20台节点的集群，建议master 节点只做master,不放data
+Master节点在网络分割等情况下，有可能不可用
 
 
 * 2PC
