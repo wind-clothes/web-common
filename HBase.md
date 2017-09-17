@@ -3,6 +3,9 @@
 * coprocessor
 ### 数据存储结构
 
+http://www.blogjava.net/DLevin/archive/2015/08/22/426877.html
+http://www.blogjava.net/DLevin/archive/2015/08/22/426950.html
+
 Row Key
 
 与 NoSQL 数据库一样，Row Key 是用来检索记录的主键。访问 HBase table 中的行，只有三种方式：
