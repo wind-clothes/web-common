@@ -50,3 +50,6 @@
     * 生成StatTask更新元数据
     * 剪断Map与Reduce间的Operator的关系
 * 物理层优化器进行MapReduce任务的变换，生成最终的执行计划.
+
+
+https://tech.meituan.com/hive-sql-to-mapreduce.html
