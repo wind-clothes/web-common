@@ -17,22 +17,22 @@
     基本的操作符包括TableScanOperator，SelectOperator，FilterOperator，JoinOperator，GroupByOperator，ReduceSinkOperator
 
     Operator类的主要属性和方法如下
-
-    RowSchema表示Operator的输出字段
-    InputObjInspector outputObjInspector解析输入和输出字段
-    processOp接收父Operator传递的数据，forward将处理好的数据传递给子Operator处理
-    Hive每一行数据经过一个Operator处理之后，会对字段重新编号，colExprMap记录每个表达式经过当前Operator处理前后的名称对应关系，在下一个阶段逻辑优化阶段用来回溯字段名
-    由于Hive的MapReduce程序是一个动态的程序，即不确定一个MapReduce Job会进行什么运算，可能是Join，也可能是GroupBy，所以Operator将所有运行时需要的参数保存在OperatorDesc中，OperatorDesc在提交任务前序列化到HDFS上，在MapReduce任务执行前从HDFS读取并反序列化。Map阶段OperatorTree在HDFS上的位置在Job.getConf(“hive.exec.plan”) + “/map.xml”
+    * RowSchema表示Operator的输出字段
+    * InputObjInspector outputObjInspector解析输入和输出字段
+    * processOp接收父Operator传递的数据，forward将处理好的数据传递给子Operator处理
+    * Hive每一行数据经过一个Operator处理之后，会对字段重新编号，colExprMap记录每个表达式经过当前Operator处理前后的名称对应关系，在下一个阶段逻辑优化阶段用来回溯字段名
+    * 由于Hive的MapReduce程序是一个动态的程序，即不确定一个MapReduce Job会进行什么运算，可能是Join，也可能是GroupBy，所以Operator将所有运行时需要的参数保存在OperatorDesc中，OperatorDesc在提交任务前序列化到HDFS上，在MapReduce任务执行前从HDFS读取并反序列化。Map阶段OperatorTree在HDFS上的位置在Job.getConf(“hive.exec.plan”) + “/map.xml”
 
     QueryBlock生成Operator Tree
-        * QueryBlock生成Operator Tree就是遍历上一个过程中生成的QB和QBParseInfo对象的保存语法的属性，包含如下几个步骤：
-        * QB#aliasToSubq => 有子查询，递归调用
-        * QB#aliasToTabs => TableScanOperator
-        * QBParseInfo#joinExpr => QBJoinTree => ReduceSinkOperator + JoinOperator
-        * QBParseInfo#destToWhereExpr => FilterOperator
-        * QBParseInfo#destToGroupby => ReduceSinkOperator + GroupByOperator
-        * QBParseInfo#destToOrderby => ReduceSinkOperator + ExtractOperator
-        * 由于Join/GroupBy/OrderBy均需要在Reduce阶段完成，所以在生成相应操作的Operator之前都会先生成一个ReduceSinkOperator，将字段组合并序列化为Reduce Key/value, Partition Key
+    QueryBlock生成Operator Tree就是遍历上一个过程中生成的QB和QBParseInfo对象的保存语法的属性，包含如下几个步骤：
+    * QB#aliasToSubq => 有子查询，递归调用
+    * QB#aliasToTabs => TableScanOperator
+    * QBParseInfo#joinExpr => QBJoinTree => ReduceSinkOperator + JoinOperator
+    * QBParseInfo#destToWhereExpr => FilterOperator
+    * QBParseInfo#destToGroupby => ReduceSinkOperator + GroupByOperator
+    * QBParseInfo#destToOrderby => ReduceSinkOperator + ExtractOperator
+    * 由于Join/GroupBy/OrderBy均需要在Reduce阶段完成，所以在生成相应操作的Operator之前都会先生成一个ReduceSinkOperator，将字段组合并序列化为Reduce Key/value, Partition Key
+
 * 逻辑层优化器进行OperatorTree变换，合并不必要的ReduceSinkOperator，减少shuffle数据量.
     大部分逻辑层优化器通过变换OperatorTree，合并操作符，达到减少MapReduce Job，减少shuffle数据量的目的。
 
