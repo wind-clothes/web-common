@@ -1,5 +1,7 @@
 ## Hive Sql的编译解析过程
 
+http://img.blog.csdn.net/20170614225653740?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvdTAxMjkyMjgzOA==/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast
+
 * Antlr定义SQL的语法规则，完成SQL词法，语法解析，将SQL转化为抽象语法树AST Tree，hive定义了词法和语法的编译规则文件，0.11版本将Hive.g拆成了5个文件，词法规则HiveLexer.g和语法规则的4个文件SelectClauseParser.gFromClauseParser.g，IdentifiersParser.g，HiveParser.g
 * 遍历AST Tree，抽象出查询的基本组成单元QueryBlock，QueryBlock是一条SQL最基本的组成单元，包括三个部分：输入源，计算过程，输出.
     
