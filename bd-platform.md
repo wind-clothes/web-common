@@ -30,7 +30,6 @@ K-V、NOSQL数据库：**HBase、Redis、MongoDB**
 
 任务调度：Oozie、Azkaban、Zeus
 
-<img src="http://lxw1234.com/wp-content/uploads/2015/04/1.png
-"/>
+<img src="http://lxw1234.com/wp-content/uploads/2015/04/1.png" />
 
 <img src="http://7xipth.com1.z0.glb.clouddn.com/20170123-2.jpg" />
