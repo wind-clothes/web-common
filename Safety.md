@@ -23,3 +23,10 @@ OAuth的参与实体至少有如下三个：
 * 简化模式（implicit）
 * 密码模式（resource owner password credentials）
 * 客户端模式（client credentials）
+
+OAuth 2.0中的Authorization Grant代表一种中间凭证（Intermediate Credential），它代表了资源拥有者针对客户端应用获取目标资源的授权。OAuth 2.0定义了如下4种Authorization Grant类型，我们也可以利用定义其中的扩展机制定制其他类型的Authorization Grant。Authorization Grant的类型体现了授权采用的方式以及Access Token的获取机制。
+
+Implicit：它代表一种“隐式”授权方式，即客户端在取得资源拥有者（最终用户）授权的情况下直接获取Access Token，而不是间接地利用获取的Authorization Grant来取得Access Token。换句话说，此种类型的Authorization Grant代表根本不需要Authorization Grant，那么上面介绍的“Three-Legged OAuth”变成了“Two-Legged OAuth”。
+Authorization Code：这是最为典型的Authorization Grant，客户端应用在取得资源拥有者授权之后会从授权服务器得到一个Authorization Code作为Authorization Grant。在它获取寄宿于资源服务器中的目标资源之前，需要利用此Authorization Code从授权服务器获取Access Token。
+Resource Owner Password Credentials：资源拥有者的凭证直接作为获取Access Token的Authorization Grant。这种Authorization Grant类型貌似与OAuth设计的初衷向违背（OAuth的主要目的在于让客户端应用在不需要提供资源拥有者凭证的情况下能够以他的名义获取受保护的资源），但是如果客户端程序是值得被信任的，用户（资源拥有者）向其提供自己的凭证也是可以接受的。
+Client Credentials：客户端应用自身的凭证直接作为它用于获取Access Token的Authorization Grant。这种类型的Authorization Grant适用于客户端应用获取属于自己的资源，换句话说客户端应用本身相当于资源的拥有者。
