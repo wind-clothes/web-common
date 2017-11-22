@@ -30,3 +30,7 @@ OAuth 2.0中的Authorization Grant代表一种中间凭证（Intermediate Creden
 * Authorization Code：这是最为典型的Authorization Grant，客户端应用在取得资源拥有者授权之后会从授权服务器得到一个Authorization Code作为Authorization Grant。在它获取寄宿于资源服务器中的目标资源之前，需要利用此Authorization Code从授权服务器获取Access Token。
 * Resource Owner Password Credentials：资源拥有者的凭证直接作为获取Access Token的Authorization Grant。这种Authorization Grant类型貌似与OAuth设计的初衷向违背（OAuth的主要目的在于让客户端应用在不需要提供资源拥有者凭证的情况下能够以他的名义获取受保护的资源），但是如果客户端程序是值得被信任的，用户（资源拥有者）向其提供自己的凭证也是可以接受的。
 * Client Credentials：客户端应用自身的凭证直接作为它用于获取Access Token的Authorization Grant。这种类型的Authorization Grant适用于客户端应用获取属于自己的资源，换句话说客户端应用本身相当于资源的拥有者。
+
+https://yq.aliyun.com/articles/226785?spm=5176.100239.blogcont226788.27.ot3cYW
+
+https://yq.aliyun.com/articles/226788?spm=5176.100239.blogcont226789.23.PE6Sfu
