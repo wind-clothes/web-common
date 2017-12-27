@@ -21,7 +21,7 @@ _____
 
 * 基本数据结构和存储机制
 
-<img src="./images/ds/kafka_data.png" height="200px" width="300px"></img>
+<img src="./images/ds/kafka_data.png" height="300px" width="400px"></img>
 
 * 消息的路由
   在Producer进行消息传送的时候，可以根据自定义的策略来处理消息的负载均衡，是通过partition参数进行的处理的
@@ -79,7 +79,8 @@ _____
   HW(high watermark 最高的所有副本的水平位 offset为high watermark的message并不是commit的)
 
 * 数据的持久化
-
+	
+	参考其数据的存储格式
 
 
 * 如何处理所有Replica都不工作
