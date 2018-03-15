@@ -1,6 +1,6 @@
-##IO模型以及JAVA-NIO
+## IO模型以及JAVA-NIO
 _______
-###IO模型
+### IO模型
 概述linux中的IO模型有：BIO(阻塞式的IO),NIO(非阻塞式IO),IO多路复用,基于信号通知的IO,AIO（异步IO）
 
 1. BIO(阻塞式的IO)
@@ -19,11 +19,11 @@ _______
 4. 基于信号通知的IO
 5. AIO(异步IO)
 
-###java-Nio
+### java-Nio
 
 概述：
 
-####Buffer
+#### Buffer
 缓冲区由四个属性指明其状态。
 
 #####
@@ -45,5 +45,5 @@ mark<=position<=limit<=capacity
 5. duplicate复制
 6. slice缓冲区切片
 
-####Channel
+#### Channel
 ####
