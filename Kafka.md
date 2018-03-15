@@ -1,9 +1,9 @@
-##kafaka
+## kafaka
 _____
 
-###综合描述
+### 综合描述
 
-###系统架构
+### 系统架构
 
 * 组成构件
   1. Broker
@@ -40,7 +40,7 @@ _____
 
   针对consumer端，默认支持**At least one**Consumer从broker中pull消息的时候，一旦其消费完成，其将像zookeeper进行commit操作，修改offset，等下次pull消息的时候，根据offset自动消费下一条消息，如果想保证**Exactly once**可以通过业务的幂等性来处理或者需要协调offset和实际操作的输出-1.经典的做法是引入两阶段提交，2如果能让offset和操作输入存在同一个地方，比如存在同一机器的HDFS中。
 
-###实现原理
+### 实现原理
 
 * 高可用
   Kafka分配Replica的算法如下：
