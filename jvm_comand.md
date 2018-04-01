@@ -53,6 +53,7 @@ printcompilation	输出已经被JIT编译的方法.
 
 vmid表示虚拟机唯一标识符，如果是本地虚拟机进程，与LVMID一致，通常为本地虚拟机进程号，interval表示查询间隔时间，count表示查询次数。如果省略interval和count参数，表示查询一次。 
 
+[详细](https://blog.csdn.net/maosijunzi/article/details/46049117)
 * jstack：用于查看虚拟机当前的线程的状态信息，可以用该命令来查看分析死锁信息，命令格式入下：
 ```
 jstack [ option ] pid 
