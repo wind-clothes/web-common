@@ -1,13 +1,35 @@
-.classpath
-.project
-test-output/
-/log/
-/target/
-/bin/
-/.settings/
-
 # 所有临时
 node_modules
 *.iml
+# maven ignore
+target/
+*.jar
+*.war
+*.zip
+*.tar
+*.tar.gz
 
+# eclipse ignore
+.settings/
+.project
+.classpath
+
+# idea ignore
+.idea/
+*.ipr
+*.iml
+*.iws
+
+# temp ignore
+logs/
+*.doc
+*.log
+*.cache
+*.diff
+*.patch
+*.tmp
+test-output/
+# system ignore
+.DS_Store
+Thumbs.db
 .idea/

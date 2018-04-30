@@ -1,4 +1,4 @@
-###分层设计
+### 分层设计
 序列化层、函数调用层、网络传输层和服务器端处理框架
 
 1. 函数调用层：通过设置代理，来模拟rpc调用创建client，或者clientPOOL来调用底层的代码
@@ -24,9 +24,9 @@ Acceptor线程接收客户端连接请求之后创建新的SocketChannel，将�
 
 步骤2完成之后，业务层的链路正式建立，将SocketChannel从主线程池的Reactor线程的多路复用器上摘除，重新注册到Sub线程池的线程上，用于处理I/O的读写操作。
 
-###Nio框架设计与实现
+### Nio框架设计与实现
 ----
-####理想的NIO框架的特点
+#### 理想的NIO框架的特点
 
 * 优雅地隔离IO代码和业务代码
 * 易于扩展
@@ -36,7 +36,7 @@ Acceptor线程接收客户端连接请求之后创建新的SocketChannel，将�
 * 高性能
 
 
-####Nio框架的关键因素
+#### Nio框架的关键因素
 1. 数据的拷贝
    减少数据拷贝
      * ByteBuffer的选择
@@ -76,8 +76,3 @@ Acceptor线程接收客户端连接请求之后创建新的SocketChannel，将�
       *  降低GC带来的影响
    *  TCP选项、高级IO函数
    *  框架设计
-
-
-8.大数据目前是发展趋势，喜欢的话，从hadoop家族开始去了解，全文检索lucene、solr，机器学习语言R、mahout、spark MR等。storm、spark、云计算平台docker、openstack等
-9.对互联网行业感兴趣，需要深入了解java并发编程、消息队列、网络编程（socket、NIO、Netty）、JVM调优等方面下手。
-Erlang

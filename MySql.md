@@ -66,6 +66,66 @@ Next-Key锁 (record Lock + GAP Lock)
 
 <table border="1" cellspacing="0" cellpadding="0"><tbody><tr><td valign="top" colspan="2"><div>隔离级别</div><div>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 一致性读和锁</div><div>SQL</div></td><td valign="top"><div>Read Uncommited</div></td><td valign="top"><div>Read Commited</div></td><td valign="top"><div>Repeatable Read</div></td><td valign="top"><div>Serializable</div></td></tr><tr><td valign="top"><div>SQL</div></td><td valign="top"><div>条件</div></td><td valign="top">&nbsp;</td><td valign="top">&nbsp;</td><td valign="top">&nbsp;</td><td valign="top">&nbsp;</td></tr><tr><td rowspan="2"><div>select</div></td><td valign="top"><div>相等</div></td><td valign="top"><div>None locks</div></td><td valign="top"><div>Consisten read/None lock</div></td><td valign="top"><div>Consisten read/None lock</div></td><td valign="top"><div>Share locks</div></td></tr><tr><td valign="top"><div>范围</div></td><td valign="top"><div>None locks</div></td><td valign="top"><div>Consisten read/None lock</div></td><td valign="top"><div>Consisten read/None lock</div></td><td valign="top"><div>Share Next-Key</div></td></tr><tr><td rowspan="2"><div>update</div></td><td valign="top"><div>相等</div></td><td valign="top"><div>exclusive locks</div></td><td valign="top"><div>exclusive locks</div></td><td valign="top"><div>exclusive locks</div></td><td valign="top"><div>Exclusive locks</div></td></tr><tr><td valign="top"><div>范围</div></td><td valign="top"><div>exclusive next-key</div></td><td valign="top"><div>exclusive next-key</div></td><td valign="top"><div>exclusive next-key</div></td><td valign="top"><div>exclusive next-key</div></td></tr><tr><td><div>Insert</div></td><td valign="top"><div>N/A</div></td><td valign="top"><div>exclusive locks</div></td><td valign="top"><div>exclusive locks</div></td><td valign="top"><div>exclusive locks</div></td><td valign="top"><div>exclusive locks</div></td></tr><tr><td rowspan="2"><div>replace</div></td><td valign="top"><div>无键冲突</div></td><td valign="top"><div>exclusive locks</div></td><td valign="top"><div>exclusive locks</div></td><td valign="top"><div>exclusive locks</div></td><td valign="top"><div>exclusive locks</div></td></tr><tr><td valign="top"><div>键冲突</div></td><td valign="top"><div>exclusive next-key</div></td><td valign="top"><div>exclusive next-key</div></td><td valign="top"><div>exclusive next-key</div></td><td valign="top"><div>exclusive next-key</div></td></tr><tr><td rowspan="2"><div>delete</div></td><td valign="top"><div>相等</div></td><td valign="top"><div>exclusive locks</div></td><td valign="top"><div>exclusive locks</div></td><td valign="top"><div>exclusive locks</div></td><td valign="top"><div>exclusive locks</div></td></tr><tr><td valign="top"><div>范围</div></td><td valign="top"><div>exclusive next-key</div></td><td valign="top"><div>exclusive next-key</div></td><td valign="top"><div>exclusive next-key</div></td><td valign="top"><div>exclusive next-key</div></td></tr><tr><td rowspan="2"><div>Select ... from ... Lock in share mode</div></td><td valign="top"><div>相等</div></td><td valign="top"><div>Share locks</div></td><td valign="top"><div>Share locks</div></td><td valign="top"><div>Share locks</div></td><td valign="top"><div>Share locks</div></td></tr><tr><td valign="top"><div>范围</div></td><td valign="top"><div>Share locks</div></td><td valign="top"><div>Share locks</div></td><td valign="top"><div>Share Next-Key</div></td><td valign="top"><div>Share Next-Key</div></td></tr><tr><td rowspan="2"><div>Select * from ... For update</div></td><td valign="top"><div>相等</div></td><td valign="top"><div>exclusive locks</div></td><td valign="top"><div>exclusive locks</div></td><td valign="top"><div>exclusive locks</div></td><td valign="top"><div>exclusive locks</div></td></tr><tr><td valign="top"><div>范围</div></td><td valign="top"><div>exclusive locks</div></td><td valign="top"><div>Share locks</div></td><td valign="top"><div>exclusive next-key</div></td><td valign="top"><div>exclusive next-key</div></td></tr><tr><td rowspan="2"><div>Insert into ... Select ...</div><div>（指源表锁）</div></td><td valign="top"><div>innodb_locks_unsafe_for_binlog=off</div></td><td valign="top"><div>Share Next-Key</div></td><td valign="top"><div>Share Next-Key</div></td><td valign="top"><div>Share Next-Key</div></td><td valign="top"><div>Share Next-Key</div></td></tr><tr><td valign="top"><div>innodb_locks_unsafe_for_binlog=on</div></td><td valign="top"><div>None locks</div></td><td valign="top"><div>Consisten read/None lock</div></td><td valign="top"><div>Consisten read/None lock</div></td><td valign="top"><div>Share Next-Key</div></td></tr><tr><td rowspan="2"><div>create table ... Select ...</div><div>（指源表锁）</div></td><td valign="top"><div>innodb_locks_unsafe_for_binlog=off</div></td><td valign="top"><div>Share Next-Key</div></td><td valign="top"><div>Share Next-Key</div></td><td valign="top"><div>Share Next-Key</div></td><td valign="top"><div>Share Next-Key</div></td></tr><tr><td valign="top"><div>innodb_locks_unsafe_for_binlog=on</div></td><td valign="top"><div>None locks</div></td><td valign="top"><div>Consisten read/None lock</div></td><td valign="top"><div>Consisten read/None lock</div></td><td valign="top"><div>Share Next-Key</div></td></tr></tbody></table>
 
+### 事务的实现原理
 
+* ReadView
+* undo-log链
 
+[事务实现原理](https://www.zhihu.com/question/263820564)
 [MySQL数据库事务各隔离级别加锁情况--read committed && MVCC](http://www.imooc.com/article/17290?block_id=tuijian_wz)
+
+### 索引
+
+#### 索引存储
+B-Tree
+B+Tree
+
+[索引原理](https://www.kancloud.cn/kancloud/theory-of-mysql-index/41844)
+* 索引查询: 全关键字，范围，前缀
+* 索引排序：order by
+
+#### 索引类型
+
+* 聚簇索引（primary索引）:主键索引 
+	
+	这意味着通过二级索引查找行，存储引擎需要：1、找到二级索引的叶子节点获取对应的主键值，2、根据这个主键值去聚簇索引中查找到对应的行。这里需要两次B+Tree查找而不是一次。
+
+
+* 非聚簇索引（second索引）:二级索引 
+* Hash索引: 哈希索引基于哈希表实现，只有精确索引所有列的查询才有效
+* 空间(R-Tree)索引:MyISAM支持空间索引，主要用于地理空间数据类型，例如GEOMETRY
+* 全文(Full-text)索引:全文索引是MyISAM的一个特殊索引类型，它查找的是文本中的关键词，主要用于全文检索。
+
+#### 索引使用
+一般来说，在WHERE和JOIN中出现的列需要建立索引，但也不完全如此，因为MySQL的B+Tree只对<，<=，=，>，>=，BETWEEN，IN，以及不以通配符开始的LIKE才会使用索引。
+
+* 普通索引(KEY OR INDEX): 这是最基本的索引，它没有任何限制。普通索引（由关键字KEY或INDEX定义的索引）的唯一任务是加快对数据的访问速度。因此，应该只为那些最经常出现在查询条件(WHERE column = …)或排序条件(ORDER BY column)中的数据列创建索引。
+* 唯一索引(UNIQUE KEY OR INDEX): 它与前面的普通索引类似，不同的就是：普通索引允许被索引的数据列包含重复的值。而唯一索引列的值必须唯一，但允许有空值。如果是组合索引，则列值的组合必须唯一。
+* 主键索引(PRIMARY KEY): 它是一种特殊的唯一索引，不允许有空值。一个表只能有一个主键。
+* 组合索引: 与普通索引相似，只不过是多个列组合作为索引项。
+
+技巧和注意点：
+
+* 索引字段尽量使用数字型（简单的数据类型） 
+* 尽量不要让字段的默认值为NULL
+* 前缀索引和索引选择性
+* 使用唯一索引
+* 使用组合索引代替多个列索引 
+* 注意重复/冗余的索引、不使用的索引 
+* 如果对大的文本进行搜索，使用全文索引而不要用使用 like ‘%…%’；like语句不要以通配符开头 
+* 不要在列上进行运算 
+* 尽量不要使用NOT IN、<>、!= 操作
+* or条件:用 or 分割开的条件，如果 or 前的条件中的列有索引，而后面的列中没有索引，那么涉及到的索引都不会被用到。
+* 组合索引的使用要遵守“最左前缀”原则'
+
+
+查看索引使用情况：
+
+* explain   执行计划，sql
+* show status  查看数据库的运行状态
+
+
+
+
+
+

@@ -1,0 +1,9 @@
+package meituan.zylproxy.handlder;
+
+import java.lang.reflect.Method;
+
+public interface ZYLInvocationHandler {
+
+    public Object invoke(Object proxy, Method method, Object[] args)
+        throws Exception;
+}
